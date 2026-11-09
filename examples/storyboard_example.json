@@ -1,0 +1,52 @@
+{
+  "title": "通俗理解注意力机制 (Attention Mechanism)",
+  "summary": "用聚光灯的比喻，解释 Transformer 核心注意力的计算逻辑与缩放点积原理。",
+  "durationSec": 60,
+  "style": "warm-story",
+  "pages": [
+    {
+      "id": "p01",
+      "section": "Hook: 海量信息中，大脑如何寻找重点？",
+      "say": "想象一下，你走进一间漆黑的藏书阁。面对成千上万的书籍，你手里的手电筒会照向哪里？",
+      "core": true,
+      "beats": [
+        {
+          "at": "c0",
+          "object": "a bookshelf in dark",
+          "action": "outlines fade in quietly",
+          "camera": "fixed",
+          "text": "万卷藏书"
+        },
+        {
+          "at": "c1:手电筒",
+          "object": "a spotlight beam",
+          "action": "sweeps across and focuses on a single scroll",
+          "camera": "push in",
+          "text": "定向聚焦"
+        }
+      ]
+    },
+    {
+      "id": "p02",
+      "section": "Mechanism: Query, Key 与 Value 的三剑客",
+      "say": "在人工智能里，这束光被拆成了三个矩阵：你的提问是Query，书的标签是Key，而书里的正文就是Value。",
+      "core": true,
+      "beats": [
+        {
+          "at": "c0",
+          "object": "three parchment cards",
+          "action": "drop onto the desk side by side",
+          "camera": "fixed",
+          "text": "Q / K / V"
+        },
+        {
+          "at": "c1:提问",
+          "object": "a magnifying glass",
+          "action": "links Query to Key with a glowing line",
+          "camera": "pan",
+          "text": "匹配相似度"
+        }
+      ]
+    }
+  ]
+}
