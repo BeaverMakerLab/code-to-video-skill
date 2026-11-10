@@ -7,7 +7,7 @@
 
 ## 目录
 1. [为什么使用代码驱动视频 (Why Code-to-Video)](#一-为什么使用代码驱动视频)
-2. [环境准备与一键诊断](#二-环境准备与一键诊断)
+2. [环境准备与四层部署指南](#二-环境准备与四层部署指南)
 3. [标准制作五步流水线](#三-标准制作五步流水线)
 4. [视频风格与画幅切换指南](#四-视频风格与画幅切换指南)
 5. [配音与亚秒级音画同步](#五-配音与亚秒级音画同步)
@@ -20,7 +20,7 @@
 
 ## 一、 为什么使用代码驱动视频
 
-市面上的 Sora、Runway、可灵等扩散模型（Diffusion）适合生成氛围感艺术镜头，但在**知识科普、技术讲解、数学推导与教育培训**领域存在难以克服的硬伤：
+市面上的 Seedance、MiniMax H3、可灵等视频生成大模型适合生成氛围感艺术与影视镜头，但在**知识科普、技术讲解、数学推导与教育培训**领域存在难以克服的硬伤：
 - ❌ **文字易畸变**：无法原生渲染清晰的公式、代码和多级标题；
 - ❌ **抽卡盲盒**：无法局部精细修改，改动一个字往往整段画面变异；
 - ❌ **成本高昂**：需要重型 GPU 服务器渲染，生成缓慢。
@@ -34,17 +34,51 @@
 
 ---
 
-## 二、 环境准备与一键诊断
+## 二、 环境准备与四层部署指南
 
-### 1. 基础依赖（任何现代开发电脑标配）
-* **Node.js**：版本 $\ge 20$（推荐 Node 22+）
-* **浏览器**：本机装有 Google Chrome 或 Microsoft Edge（Windows 默认自带 Edge）
-* **FFmpeg**：视频音频合成压制工具（引擎已内置或使用系统全局 PATH）
-* **包管理器**：`pnpm`
+> 📘 完整跨设备部署细节也可参阅：[MIGRATION.md](./MIGRATION.md)
 
-### 2. 一键环境体检
-在新电脑或初次配置时，进入技能目录运行体检脚本：
+由于视频通过代码在无头浏览器中渲染，**不需要昂贵的 GPU 服务器**，任何现代办公电脑（Windows / macOS / Linux）均可丝滑跑满。部署仅需以下四层配置：
+
+### 1. 第一层：基础系统环境（三件套）
+* **Node.js（版本 $\ge 22$）**：
+  * Windows：`winget install OpenJS.NodeJS.LTS`（或前往 [nodejs.org](https://nodejs.org/) 下载）
+  * macOS：`brew install node@22`
+* **pnpm 包管理器**：
+  ```bash
+  corepack enable && corepack prepare pnpm@latest --activate
+  # 或 npm install -g pnpm
+  ```
+* **Chrome 或 Edge 浏览器**：
+  * Windows 默认自带的 **Microsoft Edge** 即可直接作为无头渲染器；macOS/Linux 安装 Google Chrome 或 Chromium 即可。底层使用 `playwright-core` 通过 CDP 协议直接复用本机浏览器，无需额外下载数百兆的 Chromium。
+
+### 2. 第二层：渲染引擎与视觉资产依赖（一条命令全自动配齐）
+在引擎工程根目录下执行：
 ```bash
+pnpm install && pnpm build
+```
+该命令会自动安装并配置好所有核心视觉资产，**无需手动安装系统字体或解码器**：
+* **内置 FFmpeg（`ffmpeg-static`）**：自动下载对应系统的静态二进制压制工具（支持 NVIDIA `h264_nvenc` 与 Apple `VideoToolbox` `--hw` 硬件加速）。
+* **内置跨平台开源字体**：自动安装 **霞鹜文楷（`lxgw-wenkai-webfont`）**、英文手写体 `Caveat`、代码等宽体 `JetBrains Mono` 与圆体数字 `Fredoka`，确保跨系统渲染 100% 像素级一致。
+* **内置图形与数学库**：自动挂载 `Rough.js`（手绘物理笔触）、`KaTeX`（数学公式分解）、`Three.js`（3D 场景）与 `simple-icons`（品牌矢量图标）。
+
+### 3. 第三层：语音合成（TTS）与词级时间戳环境（任选其一）
+* **方案 A（云端 API，零本地算力）**：设置环境变量 `VOLCENGINE_TTS_API_KEY`（火山引擎）或 `ELEVENLABS_API_KEY`。
+* **方案 B（本地 CosyVoice 3 + FunASR 离线满血版，零成本、支持声音克隆）**：
+  ```bash
+  conda create -n cosyvoice python=3.10 -y && conda activate cosyvoice
+  pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
+  pip install funasr modelscope fastapi uvicorn soundfile
+  python voice_service.py --host 127.0.0.1 --port 9880
+  ```
+* **方案 C（轻量免费版）**：运行 `pip install edge-tts`，免费调用微软“云希/晓晓”音色并导出词级时间轴。
+
+### 4. 第四层：挂载 Skill 与一键环境体检 (Doctor)
+```bash
+# 克隆本技能到项目目录
+git clone https://github.com/BeaverMakerLab/code-to-video-skill.git .agents/skills/code-to-video
+
+# 运行跨设备环境诊断脚本
 node .agents/skills/code-to-video/scripts/doctor.mjs
 ```
 终端会逐项输出自检项：
